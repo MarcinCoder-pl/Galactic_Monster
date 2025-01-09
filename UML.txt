@@ -1,0 +1,100 @@
+@startuml
+enum CharacterAttribute {
+ HP
+ Attack 
+Defense
+ Mana
+ Exp
+ Level 
+StatPoint
+}
+struct IconMap { 
+ + symbolMap : char
+ + setIcon( symbol:char ) : void
+..friend methods..
++ostream& operator<<( const ostream& out, const Icon& in )
+} 
+class Game {
+
+}
+struct BaseStat {
+ + hp : int 
+ + attack : int
+ + defense : int
+ + mana : int
+ + experience : int 
+ + level : int 
+ + statPoint : int
+ + addStatPoint() : void
+ + allocatePoint( valuePoint:int, indexStat:int ) : void
+ + levelUp() : void
+}
+enum eObject {
+    PLAYER
+    MONSTER
+    NPC
+    ITEAM
+       
+}
+class CharacterMenager {
+ 
+ + CharacterMenager()
+ + addMonster() :Monster
+ + addNPC() : NPC
+ + addPlayer() : Player
+}
+class Character {
+ # id : int
+ # name : string
+ # baseStat : BaseStat
+ # backPac : Inventory
+ + Character() 
+}
+class Iteam {
+ # id : int
+ # name : string
+ # prince : int
+ # weight : float
+ # description : string
+ + Iteam()
+}
+class Inventory {
+ + lootContainer : list<Iteam>
+ + addItem( item:Iteam ) : void
+ + removeItem() : void
+ + Inventory( capacity=0:int )
+}
+struct Vector2D {
+ + x : int
+ + y : int
+ + Vector2D( pozX:int, pozY:int )
+ + setVector2D( pozX:int, pozY:int ) : void 
+ + getVector2D () : int
+}
+class Object {
+ + point2D : Vector2D
+ + iconMap : IconMap
+ + isVisibleOnMap() : bool
+ + isWalkable() : bool
+}
+class WorldMap {
+ # mapa : vector<Icon>
+ - object : list<Object*>
+ + WorldMap()
+ + drawMap() : void 
+ + loadMap( nameLoad:string )
+ + saveMap( nameSave:sring )
+ + randomMap() : void
+}
+
+BaseStat --> CharacterAttribute
+Character "0" --> "1" BaseStat
+Character "0" --> "1" IconMap
+Character "0" --> "1" Inventory
+Character --|> Object
+Object "0" --> "1" Vector2D
+IconMap <--Iteam
+Inventory --- Iteam
+Iteam --|> Object
+Object --- WorldMap
+@enduml
