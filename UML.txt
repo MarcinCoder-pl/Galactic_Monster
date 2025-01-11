@@ -2,21 +2,20 @@
 enum CharacterAttribute {
  HP
  Attack 
-Defense
+ Defense
  Mana
  Exp
  Level 
-StatPoint
+ StatPoint
 }
+
 struct IconMap { 
  + symbolMap : char
- + setIcon( symbol:char ) : void
-..friend methods..
-+ostream& operator<<( const ostream& out, const Icon& in )
-} 
-class Game {
-
+ + setIcon(symbol: char) : void
+ + ostream& operator<<(ostream& out, const Icon& in)
+ + getIcon() : char
 }
+
 struct BaseStat {
  + hp : int 
  + attack : int
@@ -26,75 +25,302 @@ struct BaseStat {
  + level : int 
  + statPoint : int
  + addStatPoint() : void
- + allocatePoint( valuePoint:int, indexStat:int ) : void
+ + allocatePoint(valuePoint: int, indexStat: int) : void
  + levelUp() : void
+ + resetStats() : void
 }
+
 enum eObject {
-    PLAYER
-    MONSTER
-    NPC
-    ITEAM
-       
+ PLAYER
+ MONSTER
+ NPC
+ ITEM
 }
+
+enum QuestStatus {
+ NotStarted
+ InProgress
+ Completed
+}
+
+class Quest {
+ + id : int
+ + description : string
+ + status : QuestStatus
+ + reward : string
+ + startQuest() : void
+ + completeQuest() : void
+}
+
+class QuestManager {
+ + quests : list<Quest>
+ + addQuest(quest: Quest) : void
+ + removeQuest(quest: Quest) : void
+ + getActiveQuests() : list<Quest>
+}
+
 class CharacterMenager {
- 
  + CharacterMenager()
- + addMonster() :Monster
+ + addMonster() : Monster
  + addNPC() : NPC
  + addPlayer() : Player
+ + removeCharacter(id: int) : void
+ + getCharacter(id: int) : Character
 }
-class Character {
+
+abstract class Character {
  # id : int
  # name : string
  # baseStat : BaseStat
- # backPac : Inventory
- + Character() 
+ # inventory : Inventory
+ + Character(id: int, name: string)
+ + getName() : string
+ + getId() : int
+ + updateStat(attribute: CharacterAttribute, value: int) : void
 }
-class Iteam {
+
+abstract class Movable {
+ + moveTo(position: Vector2D) : void
+ + getPosition() : Vector2D
+}
+
+abstract class Walkable {
+ + walk(direction: string) : void
+}
+
+abstract class Tradeable {
+ + buy(item: Item, quantity: int) : bool
+ + sell(item: Item, quantity: int) : bool
+}
+
+abstract class Evolvable {
+ + evolve() : Monster
+ + canEvolve() : bool
+}
+
+abstract class Combiner {
+ + combine(monster1: Monster, monster2: Monster) : Monster
+}
+
+abstract class Attackable {
+ + addAttack(attack: Attack) : bool
+ + removeAttack(attack: Attack) : bool
+ + getAttacks() : list<Attack>
+}
+
+class Attack {
+ + id : int
+ + name : string
+ + damage : int
+ + cost : int
+ + Attack(name: string, damage: int, cost: int)
+}
+
+class Player {
+ + Player(id: int, name: string)
+ + interact() : void
+ + attack(target: Object) : void
+ + trade(trader: Tradeable, item: Item, quantity: int) : bool
+ # questManager : QuestManager
+ # monsterBox : MonsterBox
+}
+
+class Monster {
+ + Monster(id: int, name: string)
+ + chase(target: Player) : void
+ + attack(target: Player) : void
+ + useAbility() : void
+ + getElementType() : string
+ + takeDamage(damage: int) : void
+ + chooseAttack() : Attack
+ + onDefeat() : void
+}
+
+class MonsterBox {
+ + addMonster(monster: Monster) : bool
+ + removeMonster(monsterId: int) : bool
+ + getMonsters() : list<Monster>
+ - monsters : list<Monster>
+}
+
+class CaptureManager {
+ + captureMonster(target: Monster) : bool
+ + isCaptureSuccessful(target: Monster) : bool
+}
+
+class BattleManager {
+ + startBattle(monster1: Monster, monster2: Monster) : void
+ + executeTurn(attacker: Monster, defender: Monster) : void
+ + calculateDamage(attack: Attack, defender: Monster) : int
+ + checkWinner(monster1: Monster, monster2: Monster) : Monster
+}
+
+class Woda {
+ + Woda(id: int, name: string)
+ + useWaterAbility() : void
+ + getElementType() : string
+}
+
+class Ogien {
+ + Ogien(id: int, name: string)
+ + useFireAbility() : void
+ + getElementType() : string
+}
+
+class Ziemia {
+ + Ziemia(id: int, name: string)
+ + useEarthAbility() : void
+ + getElementType() : string
+}
+
+class SteamMonster {
+ + SteamMonster(id: int, name: string)
+ + useSteamAbility() : void
+ + getElementType() : string
+}
+
+class NPC {
+ + NPC(id: int, name: string)
+ + talk() : string
+ + offerTrade() : bool
+}
+
+class Merchant {
+ + Merchant(id: int, name: string)
+ + addToInventory(item: Item) : void
+ + removeFromInventory(item: Item) : void
+ + listItems() : list<Item*>
+}
+
+class Item {
  # id : int
  # name : string
- # prince : int
+ # price : int
  # weight : float
  # description : string
- + Iteam()
+ # quantity : int
+ + Item(id: int, name: string, price: int, weight: float, description: string, quantity: int = 1)
+ + getQuantity() : int
+ + setQuantity(quantity: int) : void
 }
+
 class Inventory {
- + lootContainer : list<Iteam>
- + addItem( item:Iteam ) : void
- + removeItem() : void
- + Inventory( capacity=0:int )
+ + items : map<Item, int>
+ + addItem(item: Item, quantity: int) : void
+ + removeItem(item: Item, quantity: int) : void
+ + getItemQuantity(item: Item) : int
+ + hasItem(item: Item, quantity: int) : bool
+ + Inventory(capacity: int = 0)
 }
+
 struct Vector2D {
  + x : int
  + y : int
- + Vector2D( pozX:int, pozY:int )
- + setVector2D( pozX:int, pozY:int ) : void 
- + getVector2D () : int
+ + Vector2D(pozX: int, pozY: int)
+ + setVector2D(pozX: int, pozY: int) : void 
+ + getVector2D() : Vector2D
+ + distanceTo(other: Vector2D) : float
 }
+
 class Object {
  + point2D : Vector2D
  + iconMap : IconMap
  + isVisibleOnMap() : bool
  + isWalkable() : bool
-}
-class WorldMap {
- # mapa : vector<Icon>
- - object : list<Object*>
- + WorldMap()
- + drawMap() : void 
- + loadMap( nameLoad:string )
- + saveMap( nameSave:sring )
- + randomMap() : void
+ + Object(position: Vector2D, icon: IconMap)
+ + getPosition() : Vector2D
 }
 
-BaseStat --> CharacterAttribute
-Character "0" --> "1" BaseStat
-Character "0" --> "1" IconMap
-Character "0" --> "1" Inventory
+class MapMenager {
+ + newMap() : WorldMap
+ + getObjectAt(position: Vector2D) : Object*
+ + removeObjectAt(position: Vector2D) : void
+}
+
+class WorldMap {
+ # mapa : vector<Icon>
+ # object : list<Object*>
+ + WorldMap()
+ + drawMap() : void 
+ + loadMap(nameLoad: string) : void
+ + saveMap(nameSave: string) : void
+ + randomMap() : void
+ + placeObject(obj: Object, position: Vector2D) : void
+}
+
+class GameEditor {
+ + startEditor() : void
+ + saveProject(name: string) : void
+ + loadProject(name: string) : void
+}
+
+class GameManager {
+ + initGame() : void
+ + runGameLoop() : void
+ + saveGame() : void
+ + loadGame() : void
+ # characterMenager : CharacterMenager
+ # mapMenager : MapMenager
+ # worldMap : WorldMap
+ # playerInterface : PlayerInterface
+ # battleManager : BattleManager
+ # captureManager : CaptureManager
+}
+
+class PlayerInterface {
+ + displayMainMenu() : void
+ + displayInventory() : void
+ + displayQuests() : void
+ + displayCharacterStatus() : void
+ + handlePlayerInput() : void
+}
+
+GameManager --> CharacterMenager
+GameManager --> MapMenager
+GameManager --> WorldMap
+GameManager --> PlayerInterface
+GameManager --> BattleManager
+GameManager --> CaptureManager
+Player --> MonsterBox
+CaptureManager --> Monster
+
+BattleManager --> Monster
+PlayerInterface --> Player
+
+CharacterMenager --- "1..*" Character
+CharacterMenager --- "1" GameEditor
+CharacterMenager --- "1" WorldMap
+CharacterMenager --- "1" MapMenager
+
+BaseStat --> "1" CharacterAttribute
+Character "1" --> "1" BaseStat
+Character "1" --> "1" IconMap
+Character "1" --> "1" Inventory
 Character --|> Object
-Object "0" --> "1" Vector2D
-IconMap <--Iteam
-Inventory --- Iteam
-Iteam --|> Object
-Object --- WorldMap
+Character --|> Movable
+Movable <|-- Walkable
+Player --|> Character
+Player --|> Walkable
+Player --|> Tradeable
+Player "1" --> "1" QuestManager
+QuestManager --> "1..*" Quest
+Monster --|> Character
+Monster --|> Walkable
+Monster --|> Evolvable
+Monster --|> Combiner
+Monster --|> Attackable
+Woda --|> Monster
+Ogien --|> Monster
+Ziemia --|> Monster
+SteamMonster --|> Monster
+NPC --|> Character
+NPC --|> Tradeable
+Merchant --|> NPC
+Merchant --|> Tradeable
+Object "1" --> "1" Vector2D
+IconMap <-- "0..*" Item
+Inventory --- "1..*" Item
+Item --|> Object
+Object --- "1..*" WorldMap
+Attackable "1" --> "1..6" Attack
 @enduml
